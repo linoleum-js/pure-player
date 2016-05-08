@@ -1,0 +1,20 @@
+{
+  "name": "pure-player",
+  "version": "0.0.1",
+  "description": "Pure js player",
+  "main": "index.js",
+  "repository": "https://github.com/linoleum-js/pure-player",
+  "scripts": {
+    "start": "watchify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]"
+  },
+  "keywords": [
+    "player",
+    "audio"
+  ],
+  "author": "Martin Schulz",
+  "license": "MIT",
+  "devDependencies": {
+    "tsify": "^0.15.3",
+    "watchify": "*"
+  }
+}
