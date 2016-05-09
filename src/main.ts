@@ -1,4 +1,4 @@
 
-import PurePlayer from "./player.ts";
+import PurePlayer from "./Player";
 
-const player = new PurePlayer();
+const player: PurePlayer = new PurePlayer();
