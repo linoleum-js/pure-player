@@ -17,7 +17,7 @@ export default class Playlist extends EventEmitter {
   }
 
   public removeTrack(track: Track) {
-    this.tracks = this.tracks.filter((item) => {
+    this.tracks = this.tracks.filter((item: Track) => {
       return item !== track;
     });
   }

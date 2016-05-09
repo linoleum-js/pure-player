@@ -7,6 +7,8 @@ import {EventEmitter} from "./util";
 
 interface IPlayerConfig {
   audioAttributes?: Object;
+  circular?: boolean;
+
 }
 
 /**
@@ -18,9 +20,14 @@ export default class PurePlayer extends EventEmitter {
   private audioElement: HTMLAudioElement;
   private playlist: PlaylistManager;
   private config: IPlayerConfig;
+  private currentUrlIndex: number = 0;
 
   constructor (customConfig?: IPlayerConfig) {
+    super();
     this.playlist = new PlaylistManager();
+    document.getElementById('stop').addEventListener('click', () => {
+      this.stop();
+    });
   }
 
   /**
@@ -47,20 +54,35 @@ export default class PurePlayer extends EventEmitter {
     return this.currentTrack;
   }
 
+  public setVolume(volume: number) {
+    this.audioElement.volume = volume;
+  }
+
+  public getVolume(): number {
+    return this.audioElement.volume;
+  }
+
   private playTrack(track: Track) {
     if (!this.audioElement) {
       this.audioElement = new Audio();
     }
 
-    let list = track.getStreamUrlList();
-    let supportedTypes = list.filter((item: IStreamUrl) => {
-      return this.audioElement.canPlayType(item.type);
-    });
+    let audio: HTMLAudioElement = this.audioElement;
+    let onerrorCallback = (event: any) => {
+      if (!event.currentTarget.error) { return; }
+      this.currentUrlIndex++;
+      this.playTrack(track);
+    };
 
-    if (!supportedTypes.length) {
-      this.emit('play:failed', track.getFullData());
-    } else {
-
+    track.orderStreamUrls(audio);
+    audio.removeEventListener('error', onerrorCallback);
+    if (this.currentUrlIndex >= track.getUrlsNumber()) {
+      this.emit('error', track);
+      this.stop();
+      return;
     }
+    audio.addEventListener('error', onerrorCallback, false);
+    audio.src = track.getStreamUrl(this.currentUrlIndex).url;
+    audio.play();
   }
 }

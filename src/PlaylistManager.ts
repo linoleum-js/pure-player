@@ -25,7 +25,7 @@ export default class PlaylistManager {
   }
 
   public getPlaylist(name: string): Playlist {
-    return this.playlists.filter((item) => {
+    return this.playlists.filter((item: Playlist) => {
       return item.getName() === name;
     })[0] || null;
   }
@@ -35,7 +35,7 @@ export default class PlaylistManager {
   }
 
   public hasPlaylist(name: string): boolean {
-    return this.playlists.filter((item) => {
+    return this.playlists.filter((item: Playlist) => {
       return item.getName() === name;
     }).length === 1;
   }
