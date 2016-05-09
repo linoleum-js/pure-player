@@ -8,19 +8,19 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Track_1 = require("./Track");
 var PlaylistManager_1 = require("./PlaylistManager");
 var util_1 = require("./util");
+var default_config_1 = require("./default-config");
+var dom_1 = require("./dom");
 /**
  *
  */
 var PurePlayer = (function (_super) {
     __extends(PurePlayer, _super);
     function PurePlayer(customConfig) {
-        var _this = this;
         _super.call(this);
         this.currentUrlIndex = 0;
+        this.config = util_1.deepExtend({}, default_config_1.default, customConfig);
         this.playlist = new PlaylistManager_1.default();
-        document.getElementById('stop').addEventListener('click', function () {
-            _this.stop();
-        });
+        this.registerEvents();
     }
     /**
      *
@@ -31,6 +31,11 @@ var PurePlayer = (function (_super) {
     PurePlayer.prototype.stop = function () {
         this.audioElement.pause();
         this.audioElement.currentTime = 0;
+        this.isPlaying = false;
+    };
+    PurePlayer.prototype.pause = function () {
+        this.isPlaying = false;
+        this.audioElement.pause();
     };
     PurePlayer.prototype.getCurrentTime = function () {
         return this.audioElement.currentTime;
@@ -50,7 +55,12 @@ var PurePlayer = (function (_super) {
     PurePlayer.prototype.playTrack = function (track) {
         var _this = this;
         if (!this.audioElement) {
-            this.audioElement = new Audio();
+            this.createAudioNode();
+        }
+        if (this.currentUrlIndex >= track.getUrlsNumber()) {
+            this.emit('error', track);
+            this.stop();
+            return;
         }
         var audio = this.audioElement;
         var onerrorCallback = function (event) {
@@ -60,23 +70,49 @@ var PurePlayer = (function (_super) {
             _this.currentUrlIndex++;
             _this.playTrack(track);
         };
-        track.orderStreamUrls(audio);
         audio.removeEventListener('error', onerrorCallback);
-        if (this.currentUrlIndex >= track.getUrlsNumber()) {
-            this.emit('error', track);
-            this.stop();
-            return;
-        }
         audio.addEventListener('error', onerrorCallback, false);
+        track.orderStreamUrls(audio);
         audio.src = track.getStreamUrl(this.currentUrlIndex).url;
         audio.play();
+    };
+    PurePlayer.prototype.createAudioNode = function () {
+        var audio = new Audio();
+        for (var attrName in this.config.audioAttributes) {
+            audio[attrName] = this.config.audioAttributes[attrName];
+        }
+        this.audioElement = audio;
+    };
+    PurePlayer.prototype.registerEvents = function () {
+        var _this = this;
+        var config = this.config;
+        var getClass = function (ctrlName) {
+            var className = config.nodes[ctrlName];
+            return '.' + className;
+        };
+        var addEvent = function (eventName, ctrlName, callback) {
+            dom_1.default.on(eventName, getClass(ctrlName), function (event) {
+                if (!config.preventEvents) {
+                    callback(event);
+                }
+            });
+        };
+        addEvent('click', 'btnPlay', function () {
+            _this.playTrack(_this.getCurrentTrack());
+        });
+        addEvent('click', 'btnPause', function () {
+            _this.pause();
+        });
+        addEvent('click', 'btnStop', function () {
+            _this.stop();
+        });
     };
     return PurePlayer;
 }(util_1.EventEmitter));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PurePlayer;
 
-},{"./PlaylistManager":3,"./Track":4,"./util":6}],2:[function(require,module,exports){
+},{"./PlaylistManager":3,"./Track":4,"./default-config":5,"./dom":6,"./util":8}],2:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -128,7 +164,7 @@ var Playlist = (function (_super) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Playlist;
 
-},{"./util":6}],3:[function(require,module,exports){
+},{"./util":8}],3:[function(require,module,exports){
 "use strict";
 var Playlist_1 = require("./Playlist");
 var Track_1 = require("./Track");
@@ -215,28 +251,102 @@ exports.default = Track;
 
 },{}],5:[function(require,module,exports){
 "use strict";
-var Player_1 = require("./Player");
-var player = new Player_1.default();
-player.play({
-    streamUrlList: [{
-            type: 'audio/vsdvsdv',
-            url: 'notfound1'
-        }, {
-            type: 'audio/ogg',
-            url: 'notfound2'
-        }, {
-            type: 'audio/mp3',
-            url: 'http://download.wavetlan.com/SVV/Media/HTTP/MP3/Helix_Mobile_Producer/HelixMobileProducer_test1_MPEG2_Mono_CBR_40kbps_16000Hz.mp3'
-        }, {
-            type: 'audio/wav',
-            url: 'notfound3'
-        }, {
-            type: 'audio/grgerg',
-            url: 'notfound4'
-        }]
-});
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = {
+    audioAttributes: {
+        preload: 'auto',
+        autoplay: 'false'
+    },
+    circular: false,
+    preventEvents: false,
+    nodes: {
+        root: 'js-player',
+        btnPlay: 'js-player-play',
+        btnStop: 'js-player-stop',
+        btnPause: 'js-player-pause',
+        btnPlayToggle: 'js-player-play-toggle',
+        btnNext: 'js-player-next',
+        btnPrev: 'js-player-prev',
+        inputVolume: 'js-player-input-volume',
+        inputTime: 'js-player-input-time',
+        playlistItem: 'js-player-playlist-item'
+    }
+};
 
-},{"./Player":1}],6:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+"use strict";
+var util_1 = require("./util");
+;
+var $ = function $(selector, startNode) {
+    if (startNode === void 0) { startNode = document; }
+    return startNode.querySelectorAll(selector);
+};
+$.removeClass = function (element, className) {
+    var classList = element.className.split(' ');
+    element.className = classList.filter(function (item) {
+        return item.trim() !== className.trim();
+    }).join(' ');
+};
+$.hasClass = function (element, className) {
+    var classList = element.className.split(' ');
+    return classList.some(function (item) {
+        return item.trim() === className.trim();
+    });
+};
+$.addClass = function (element, className) {
+    if ($.hasClass(element, className)) {
+        return;
+    }
+    var classList = element.className.split(' ');
+    classList.push(className);
+    element.className = classList.join(' ');
+};
+$.toggleClass = function (element, className) {
+    if ($.hasClass(element, className)) {
+        $.removeClass(element, className);
+    }
+    else {
+        $.addClass(element, className);
+    }
+};
+$.on = function (eventName, selector, callback) {
+    document.addEventListener(eventName, function (event) {
+        if (util_1.matchesSelector(event.target, selector)) {
+            callback(event);
+        }
+    }, false);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = $;
+
+},{"./util":8}],7:[function(require,module,exports){
+"use strict";
+var Player_1 = require("./Player");
+var player = new Player_1.default({
+    nodes: {
+        root: 'custom'
+    }
+});
+// player.play({
+//   streamUrlList: [{
+//     type: 'audio/vsdvsdv',
+//     url: 'notfound1'
+//   }, {
+//     type: 'audio/ogg',
+//     url: 'notfound2'
+//   }, {
+//     type: 'audio/mp3',
+//     url: 'http://download.wavetlan.com/SVV/Media/HTTP/MP3/Helix_Mobile_Producer/HelixMobileProducer_test1_MPEG2_Mono_CBR_40kbps_16000Hz.mp3'
+//   }, {
+//     type: 'audio/wav',
+//     url: 'notfound3'
+//   }, {
+//     type: 'audio/grgerg',
+//     url: 'notfound4'
+//   }]
+// });
+
+},{"./Player":1}],8:[function(require,module,exports){
 "use strict";
 var EventEmitter = (function () {
     function EventEmitter() {
@@ -259,5 +369,44 @@ var EventEmitter = (function () {
     return EventEmitter;
 }());
 exports.EventEmitter = EventEmitter;
+var isArray = function (value) {
+    return Object.prototype.toString.call(value) === '[object Array]';
+};
+var isObject = function (value) {
+    return value !== null && !isArray(value) && typeof value === 'object';
+};
+function deepExtend() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i - 0] = arguments[_i];
+    }
+    var target = args[0];
+    var sources = args.slice(1);
+    sources.forEach(function (source) {
+        for (var key in source) {
+            var sourceValue = source[key];
+            var targetValue = target[key];
+            if (isObject(sourceValue)) {
+                target[key] = deepExtend({}, targetValue, sourceValue);
+            }
+            else {
+                target[key] = source[key];
+            }
+        }
+    });
+    return target;
+}
+exports.deepExtend = deepExtend;
+var proto = Element.prototype;
+var nativeMatches = proto.matches
+    || proto.matchesSelector
+    || proto.webkitMatchesSelector
+    || proto.mozMatchesSelector
+    || proto.msMatchesSelector
+    || proto.oMatchesSelector;
+function matchesSelector(element, selector) {
+    return nativeMatches(element, selector);
+}
+exports.matchesSelector = matchesSelector;
 
-},{}]},{},[5]);
+},{}]},{},[7]);

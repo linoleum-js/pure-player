@@ -17,5 +17,8 @@
     "tsify": "^0.15.3",
     "unit.js": "^2.0.0",
     "watchify": "*"
+  },
+  "dependencies": {
+    "matches-selector": "^1.0.0"
   }
 }

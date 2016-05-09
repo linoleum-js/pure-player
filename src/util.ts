@@ -24,3 +24,45 @@ export class EventEmitter {
     });
   }
 }
+
+let isArray = (value: any) => {
+  return Object.prototype.toString.call(value) === '[object Array]';
+};
+
+let isObject = (value: any) => {
+  return value !== null && !isArray(value) && typeof value === 'object';
+};
+
+export function deepExtend (...args: Array<any>) {
+  let target: any = args[0];
+  let sources: Array<any> = args.slice(1);
+
+  sources.forEach((source: any) => {
+    for (let key in source) {
+      let sourceValue = source[key];
+      let targetValue = target[key];
+
+      if (isObject(sourceValue)) {
+        target[key] = deepExtend({}, targetValue, sourceValue);
+      } else {
+        target[key] = source[key];
+      }
+    }
+  });
+
+  return target;
+}
+
+let proto: any = Element.prototype;
+let nativeMatches = proto.matches
+  || proto.matchesSelector
+  || proto.webkitMatchesSelector
+  || proto.mozMatchesSelector
+  || proto.msMatchesSelector
+  || proto.oMatchesSelector;
+
+export function matchesSelector (element: HTMLElement|EventTarget,
+                                 selector: string): boolean {
+
+  return nativeMatches(element, selector);
+}
