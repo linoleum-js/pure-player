@@ -46,6 +46,9 @@ var PurePlayer = (function (_super) {
     PurePlayer.prototype.getCurrentTrack = function () {
         return this.currentTrack;
     };
+    PurePlayer.prototype.setCurrentTrack = function (track) {
+        this.currentTrack = track;
+    };
     PurePlayer.prototype.setVolume = function (volume) {
         this.audioElement.volume = volume;
     };
@@ -55,7 +58,7 @@ var PurePlayer = (function (_super) {
     PurePlayer.prototype.playTrack = function (track) {
         var _this = this;
         if (!this.audioElement) {
-            this.createAudioNode();
+            this.createAudioElement();
         }
         if (this.currentUrlIndex >= track.getUrlsNumber()) {
             this.emit('error', track);
@@ -76,7 +79,7 @@ var PurePlayer = (function (_super) {
         audio.src = track.getStreamUrl(this.currentUrlIndex).url;
         audio.play();
     };
-    PurePlayer.prototype.createAudioNode = function () {
+    PurePlayer.prototype.createAudioElement = function () {
         var audio = new Audio();
         for (var attrName in this.config.audioAttributes) {
             audio[attrName] = this.config.audioAttributes[attrName];
@@ -105,6 +108,18 @@ var PurePlayer = (function (_super) {
         });
         addEvent('click', 'btnStop', function () {
             _this.stop();
+        });
+        addEvent('click', 'btnNext', function () {
+            _this.stop();
+            _this.playlist.nextTrack(config.circular);
+            _this.setCurrentTrack(_this.playlist.getCurrentTrack());
+            _this.playTrack(_this.getCurrentTrack());
+        });
+        addEvent('click', 'btnNext', function () {
+            _this.stop();
+            _this.playlist.prevTrack(config.circular);
+            _this.setCurrentTrack(_this.playlist.getCurrentTrack());
+            _this.playTrack(_this.getCurrentTrack());
         });
     };
     return PurePlayer;
@@ -173,6 +188,9 @@ var PlaylistManager = (function () {
         this.playlists = [];
         this.createPlaylist('default');
     }
+    PlaylistManager.prototype.getCurrentTrack = function () {
+        return this.currentPlaylist.getCurrentTrack();
+    };
     PlaylistManager.prototype.add = function (trackData) {
         this.addTrack(new Track_1.default(trackData));
     };
@@ -194,6 +212,12 @@ var PlaylistManager = (function () {
         return this.playlists.filter(function (item) {
             return item.getName() === name;
         }).length === 1;
+    };
+    PlaylistManager.prototype.nextTrack = function (circular) {
+        this.currentPlaylist.nextTrack(circular);
+    };
+    PlaylistManager.prototype.prevTrack = function (circular) {
+        this.currentPlaylist.prevTrack(circular);
     };
     return PlaylistManager;
 }());
@@ -233,8 +257,8 @@ var Track = (function () {
             return;
         }
         var list = this.getStreamUrlList();
-        var result = [];
         var verdicts = ['probably', 'maybe', ''];
+        var result = [];
         verdicts.forEach(function (verdict) {
             var sublist = list.filter(function (item) {
                 return audio.canPlayType(item.type) === verdict;
@@ -405,7 +429,7 @@ var nativeMatches = proto.matches
     || proto.msMatchesSelector
     || proto.oMatchesSelector;
 function matchesSelector(element, selector) {
-    return nativeMatches(element, selector);
+    return nativeMatches.call(element, selector);
 }
 exports.matchesSelector = matchesSelector;
 

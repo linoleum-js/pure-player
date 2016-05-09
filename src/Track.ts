@@ -40,9 +40,9 @@ export default class Track {
   public orderStreamUrls(audio: HTMLAudioElement) {
     if (this.isUrlsOrdered) { return; }
 
-    let list: Array<IStreamUrl> = this.getStreamUrlList();
+    const list: Array<IStreamUrl> = this.getStreamUrlList();
+    const verdicts: Array<string> = ['probably', 'maybe', ''];
     let result: Array<IStreamUrl> = [];
-    let verdicts: Array<string> = ['probably', 'maybe', ''];
 
     verdicts.forEach((verdict: string) => {
       let sublist: Array<IStreamUrl> = list.filter((item: IStreamUrl) => {

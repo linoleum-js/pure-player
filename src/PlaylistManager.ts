@@ -12,6 +12,10 @@ export default class PlaylistManager {
     this.createPlaylist('default');
   }
 
+  public getCurrentTrack() {
+    return this.currentPlaylist.getCurrentTrack();
+  }
+
   public add(trackData: ITrackData) {
     this.addTrack(new Track(trackData));
   }
@@ -38,5 +42,13 @@ export default class PlaylistManager {
     return this.playlists.filter((item: Playlist) => {
       return item.getName() === name;
     }).length === 1;
+  }
+
+  public nextTrack(circular: boolean) {
+    this.currentPlaylist.nextTrack(circular);
+  }
+
+  public prevTrack(circular: boolean) {
+    this.currentPlaylist.prevTrack(circular);
   }
 }

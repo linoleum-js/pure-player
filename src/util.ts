@@ -64,5 +64,5 @@ let nativeMatches = proto.matches
 export function matchesSelector (element: HTMLElement|EventTarget,
                                  selector: string): boolean {
 
-  return nativeMatches(element, selector);
+  return nativeMatches.call(element, selector);
 }

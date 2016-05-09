@@ -57,6 +57,10 @@ export default class PurePlayer extends EventEmitter {
     return this.currentTrack;
   }
 
+  private setCurrentTrack(track: Track) {
+    this.currentTrack = track;
+  }
+
   public setVolume(volume: number) {
     this.audioElement.volume = volume;
   }
@@ -67,7 +71,7 @@ export default class PurePlayer extends EventEmitter {
 
   private playTrack(track: Track) {
     if (!this.audioElement) {
-      this.createAudioNode();
+      this.createAudioElement();
     }
     if (this.currentUrlIndex >= track.getUrlsNumber()) {
       this.emit('error', track);
@@ -88,7 +92,7 @@ export default class PurePlayer extends EventEmitter {
     audio.play();
   }
 
-  private createAudioNode() {
+  private createAudioElement() {
     const audio: any = new Audio();
     for (let attrName in this.config.audioAttributes) {
       audio[attrName] = this.config.audioAttributes[attrName];
@@ -119,6 +123,18 @@ export default class PurePlayer extends EventEmitter {
     });
     addEvent('click', 'btnStop', () => {
       this.stop();
+    });
+    addEvent('click', 'btnNext', () => {
+      this.stop();
+      this.playlist.nextTrack(config.circular);
+      this.setCurrentTrack(this.playlist.getCurrentTrack());
+      this.playTrack(this.getCurrentTrack());
+    });
+    addEvent('click', 'btnNext', () => {
+      this.stop();
+      this.playlist.prevTrack(config.circular);
+      this.setCurrentTrack(this.playlist.getCurrentTrack());
+      this.playTrack(this.getCurrentTrack());
     });
   }
 }

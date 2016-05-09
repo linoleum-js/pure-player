@@ -19,14 +19,14 @@ let $ = function $(selector: string,
 
 $.removeClass = (element: HTMLElement, className: string) => {
   let classList: Array<string> = element.className.split(' ');
-  element.className = classList.filter((item) => {
+  element.className = classList.filter((item: string) => {
     return item.trim() !== className.trim();
   }).join(' ');
 };
 
 $.hasClass = (element: HTMLElement, className: string): boolean => {
   let classList: Array<string> = element.className.split(' ');
-  return classList.some((item) => {
+  return classList.some((item: string) => {
     return item.trim() === className.trim();
   });
 };
