@@ -1,4 +1,5 @@
 import ITrackData from "./ITrackData";
+import IStreamUrl from "./IStreamUrl";
 
 export default class Track {
   private data: ITrackData;
@@ -7,11 +8,7 @@ export default class Track {
     this.data = data;
   }
 
-  public getStreamUrl(): string {
-    return this.data.streamUrl;
-  }
-
-  public getStreamUrlList(): Array<string> {
+  public getStreamUrlList(): Array<IStreamUrl> {
     return this.data.streamUrlList;
   }
 
@@ -25,5 +22,9 @@ export default class Track {
 
   public getAlbum(): string {
     return this.data.album;
+  }
+
+  public getFullData(): ITrackData {
+    return this.data;
   }
 }

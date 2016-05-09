@@ -2,6 +2,8 @@
 import Track from "./Track";
 import ITrackData from "./ITrackData";
 import PlaylistManager from "./PlaylistManager";
+import IStreamUrl from "./IStreamUrl";
+import {EventEmitter} from "./util";
 
 interface IPlayerConfig {
   audioAttributes?: Object;
@@ -10,7 +12,7 @@ interface IPlayerConfig {
 /**
  *
  */
-export default class PurePlayer {
+export default class PurePlayer extends EventEmitter {
   private isPlaying: boolean;
   private currentTrack: Track;
   private audioElement: HTMLAudioElement;
@@ -24,34 +26,41 @@ export default class PurePlayer {
   /**
    *
    */
-  public play(trackData: ITrackData): PurePlayer {
+  public play(trackData: ITrackData) {
     this.playTrack(new Track(trackData));
-    return this;
   }
 
-  public stop(): PurePlayer {
+  public stop() {
     this.audioElement.pause();
     this.audioElement.currentTime = 0;
-    return this;
   }
 
   public getCurrentTime(): number {
     return this.audioElement.currentTime;
   }
 
-  public setCurrentTime(time: number): PurePlayer {
+  public setCurrentTime(time: number) {
     this.audioElement.currentTime = time;
-    return this;
   }
 
   public getCurrentTrack(): Track {
     return this.currentTrack;
   }
 
-  private playTrack(track: Track): PurePlayer {
+  private playTrack(track: Track) {
     if (!this.audioElement) {
       this.audioElement = new Audio();
     }
-    return this;
+
+    let list = track.getStreamUrlList();
+    let supportedTypes = list.filter((item: IStreamUrl) => {
+      return this.audioElement.canPlayType(item.type);
+    });
+
+    if (!supportedTypes.length) {
+      this.emit('play:failed', track.getFullData());
+    } else {
+
+    }
   }
 }

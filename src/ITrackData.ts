@@ -1,7 +1,8 @@
 
+import IStreamUrl from "./IStreamUrl";
+
 interface ITrackData {
-  streamUrl: string;
-  streamUrlList?: Array<string>;
+  streamUrlList: Array<IStreamUrl>;
   title?: string;
   author?: string;
   album?: string;
