@@ -8,6 +8,7 @@ describe('Track', () => {
   let track: Track;
   let audio: HTMLAudioElement;
   let trackData: ITrackData = {
+    title: '123',
     streamUrlList: [{
       type: 'audio/vsdvsdv',
       url: 'notfound1'
@@ -34,7 +35,7 @@ describe('Track', () => {
   it('should sort stream urls', () => {
     beforeEach();
     track.orderStreamUrls(audio);
-
+    expect(track.getTitle()).toBe('123');
   });
 });
 
