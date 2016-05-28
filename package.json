@@ -6,7 +6,8 @@
   "repository": "https://github.com/linoleum-js/pure-player",
   "scripts": {
     "start": "watchify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]",
-    "test": ""
+    "test": "browserify ./spec/entry.ts -o ./spec/tmp/spec.js -p [ tsify ] && jasmine",
+    "preinstall": "browserify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]"
   },
   "keywords": [
     "player",
