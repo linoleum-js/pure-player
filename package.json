@@ -5,7 +5,8 @@
   "main": "index.js",
   "repository": "https://github.com/linoleum-js/pure-player",
   "scripts": {
-    "start": "watchify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]"
+    "start": "watchify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]",
+    "test": ""
   },
   "keywords": [
     "player",

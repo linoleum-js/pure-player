@@ -130,11 +130,14 @@ export default class PurePlayer extends EventEmitter {
       this.setCurrentTrack(this.playlist.getCurrentTrack());
       this.playTrack(this.getCurrentTrack());
     });
-    addEvent('click', 'btnNext', () => {
+    addEvent('click', 'btnPrev', () => {
       this.stop();
       this.playlist.prevTrack(config.circular);
       this.setCurrentTrack(this.playlist.getCurrentTrack());
       this.playTrack(this.getCurrentTrack());
+    });
+    addEvent('change', 'inputTime', () => {
+
     });
   }
 }
