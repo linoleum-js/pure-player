@@ -1,5 +1,5 @@
 
 
-import runTrackTest from "./src/TrackSpec";
+import "./src/TrackSpec";
 
-runTrackTest();
+//runTrackTest();
