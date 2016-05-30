@@ -4,6 +4,11 @@
 import Track from '../../src/Track';
 import ITrackData from '../../src/ITrackData';
 
+
+const copy = (data): any => {
+  return JSON.parse(JSON.stringify(data));
+};
+
 describe('Track', () => {
   let track: Track;
   let audio: HTMLAudioElement;
@@ -28,16 +33,28 @@ describe('Track', () => {
   };
 
   let beforeEach = () => {
-    track = new Track(trackData);
+    track = new Track(copy(trackData));
     audio = new Audio();
   };
 
   it('should sort stream urls', () => {
     beforeEach();
-    expect(track.getTitle()).toBe('123');
     track.orderStreamUrls(audio);
     // chrome-specific, may fail in other browsers
     expect(track.getStreamUrl()).toBe('http://download.wavetlan.com/SVV/Media/HTTP/MP3/Helix_Mobile_Producer/HelixMobileProducer_test1_MPEG2_Mono_CBR_40kbps_16000Hz.mp3');
+  });
+
+  it('should use next url if any', () => {
+    beforeEach();
+    expect(track.getStreamUrl()).toBe('notfound1');
+    track.nextUrl();
+    expect(track.getStreamUrl()).toBe('notfound2');
+    expect(track.hasMoreUrls()).toBe(true);
+    track.nextUrl();
+    track.nextUrl();
+    track.nextUrl();
+    track.nextUrl();
+    expect(track.hasMoreUrls()).toBe(false);
   });
 });
 
