@@ -4,8 +4,8 @@ import {EventEmitter} from "./util";
 
 export default class Playlist extends EventEmitter {
   private name: string;
-  private tracks: Array<Track>;
-  private currentTrack: number;
+  private tracks: Array<Track> = [];
+  private currentTrack: number = 0;
 
   constructor(name: string) {
     super();
@@ -14,6 +14,14 @@ export default class Playlist extends EventEmitter {
 
   public addTrack(track: Track) {
     this.tracks.push(track);
+  }
+
+  public hasTracks(): boolean {
+    return this.tracks.length !== 0;
+  }
+
+  public getTracksNumber(): number {
+    return this.tracks.length;
   }
 
   public removeTrack(track: Track) {
