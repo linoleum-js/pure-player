@@ -4,28 +4,47 @@ import Track from "./Track";
 import ITrackData from "./ITrackData";
 
 export default class PlaylistManager {
-  private playlists: Array<Playlist>;
+  private playlists: Array<Playlist> = [];
   private currentPlaylist: Playlist;
 
   constructor() {
     this.playlists = [];
     this.createPlaylist('default');
+    this.currentPlaylist = this.playlists[0];
   }
 
   public getCurrentTrack() {
     return this.currentPlaylist.getCurrentTrack();
   }
 
+  public getCurrentPlaylist(): Playlist {
+    return this.currentPlaylist;
+  }
+
+  public getPlaylistsNumber(): number {
+    return this.playlists.length;
+  }
+
   public add(trackData: ITrackData) {
     this.addTrack(new Track(trackData));
   }
 
-  private addTrack(track: Track) {
+  public addTrack(track: Track) {
     this.currentPlaylist.addTrack(track);
   }
 
   public createPlaylist(name: string) {
     this.playlists.push(new Playlist(name));
+  }
+
+  public removePlaylist(name: string) {
+    this.playlists = this.playlists.filter((item) => {
+      return item.getName() !== name;
+    });
+
+    if (this.currentPlaylist.getName() === name) {
+      this.currentPlaylist = this.playlists[0];
+    }
   }
 
   public getPlaylist(name: string): Playlist {
