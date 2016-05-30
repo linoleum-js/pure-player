@@ -6,8 +6,8 @@
   "repository": "https://github.com/linoleum-js/pure-player",
   "scripts": {
     "start": "watchify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]",
-    "open-test": "testem & google-chrome-stable http://localhost:7357/",
-    "test": "browserify ./spec/entry.ts -o ./spec/tmp/spec.js -p [ tsify ] && npm run open-test",
+    "open-test": "testem & xdg-open http://localhost:7357/",
+    "test": "watchify ./spec/entry.ts -o ./spec/tmp/spec.js -p [ tsify ] & npm run open-test",
     "postinstall": "browserify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]"
   },
   "keywords": [
@@ -18,10 +18,6 @@
   "license": "MIT",
   "devDependencies": {
     "tsify": "^0.15.3",
-    "unit.js": "^2.0.0",
     "watchify": "*"
-  },
-  "dependencies": {
-    "matches-selector": "^1.0.0"
   }
 }

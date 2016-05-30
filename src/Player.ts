@@ -4,6 +4,7 @@ import ITrackData from "./ITrackData";
 import PlaylistManager from "./PlaylistManager";
 import IStreamUrl from "./IStreamUrl";
 import IPlayerConfig from "./IPlayerConfig";
+import IPlaylist from "./IPlaylist";
 import {EventEmitter, deepExtend} from "./util";
 import defaultConfig from "./default-config";
 import $ from "./dom";
@@ -16,14 +17,13 @@ export default class PurePlayer extends EventEmitter {
   private isPlaying: boolean;
   private currentTrack: Track;
   private audioElement: HTMLAudioElement;
-  private playlist: PlaylistManager;
+  private playlist: IPlaylist;
   private config: IPlayerConfig;
-  private currentUrlIndex: number = 0;
 
-  constructor (customConfig?: IPlayerConfig) {
+  constructor (customConfig: IPlayerConfig, playlist: IPlaylist) {
     super();
     this.config = deepExtend({}, defaultConfig, customConfig);
-    this.playlist = new PlaylistManager();
+    this.playlist = playlist;
     this.registerEvents();
   }
 
@@ -73,7 +73,7 @@ export default class PurePlayer extends EventEmitter {
     if (!this.audioElement) {
       this.createAudioElement();
     }
-    if (this.currentUrlIndex >= track.getUrlsNumber()) {
+    if (!track.hasMoreUrls()) {
       this.emit('error', track);
       this.stop();
       return;
@@ -81,14 +81,14 @@ export default class PurePlayer extends EventEmitter {
     const audio: HTMLAudioElement = this.audioElement;
     const onerrorCallback = (event: any) => {
       if (!event.currentTarget.error) { return; }
-      this.currentUrlIndex++;
+      track.nextUrl();
       this.playTrack(track);
     };
 
     audio.removeEventListener('error', onerrorCallback);
     audio.addEventListener('error', onerrorCallback, false);
     track.orderStreamUrls(audio);
-    audio.src = track.getStreamUrl(this.currentUrlIndex).url;
+    audio.src = track.getStreamUrl();
     audio.play();
   }
 

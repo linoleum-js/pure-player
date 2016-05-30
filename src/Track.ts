@@ -4,6 +4,7 @@ import IStreamUrl from "./IStreamUrl";
 export default class Track {
   private data: ITrackData;
   private isUrlsOrdered: boolean = false;
+  private currentUrlIndex: number = 0;
 
   constructor (data: ITrackData) {
     this.data = data;
@@ -17,8 +18,8 @@ export default class Track {
     return this.data.streamUrlList.length;
   }
 
-  public getStreamUrl(number: number): IStreamUrl {
-    return this.data.streamUrlList[number];
+  public getStreamUrl(): string {
+    return this.data.streamUrlList[this.currentUrlIndex].url;
   }
 
   public getTitle(): string {
@@ -35,6 +36,14 @@ export default class Track {
 
   public getFullData(): ITrackData {
     return this.data;
+  }
+
+  public hasMoreUrls(): boolean {
+    return this.currentUrlIndex < this.getStreamUrlList().length;
+  }
+
+  public nextUrl() {
+    this.currentUrlIndex++;
   }
 
   public orderStreamUrls(audio: HTMLAudioElement) {

@@ -34,8 +34,10 @@ describe('Track', () => {
 
   it('should sort stream urls', () => {
     beforeEach();
-    track.orderStreamUrls(audio);
     expect(track.getTitle()).toBe('123');
+    track.orderStreamUrls(audio);
+    // chrome-specific, may fail in other browsers
+    expect(track.getStreamUrl()).toBe('http://download.wavetlan.com/SVV/Media/HTTP/MP3/Helix_Mobile_Producer/HelixMobileProducer_test1_MPEG2_Mono_CBR_40kbps_16000Hz.mp3');
   });
 });
 
