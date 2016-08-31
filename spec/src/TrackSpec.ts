@@ -2,7 +2,7 @@
 /// <reference path="../../typings/jasmine.d.ts" />
 
 import Track from '../../src/Track';
-import ITrackData from '../../src/ITrackData';
+import ITrackData from '../../src/interfaces/ITrackData';
 
 
 const copy = (data): any => {

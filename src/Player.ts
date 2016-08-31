@@ -1,30 +1,27 @@
 
 import Track from "./Track";
-import ITrackData from "./ITrackData";
-import PlaylistManager from "./PlaylistManager";
-import IStreamUrl from "./IStreamUrl";
-import IPlayerConfig from "./IPlayerConfig";
-import IPlaylist from "./IPlaylist";
-import {EventEmitter, deepExtend} from "./util";
-import defaultConfig from "./default-config";
-import $ from "./dom";
+import ITrackData from "./interfaces/ITrackData";
+import IStreamUrl from "./interfaces/IStreamUrl";
+import IPlayerConfig from "./interfaces/IPlayerConfig";
+import IPlaylist from "./interfaces/IPlaylist";
+import {EventEmitter, deepExtend} from "./utils/util";
+import defaultConfig from "./utils/default-config";
 
 
 /**
  *
  */
 export default class PurePlayer extends EventEmitter {
-  private isPlaying: boolean;
-  private currentTrack: Track;
-  private audioElement: HTMLAudioElement;
-  private playlist: IPlaylist;
-  private config: IPlayerConfig;
+  public isPlaying: boolean;
+  public currentTrack: Track;
+  public audioElement: HTMLAudioElement;
+  public playlist: IPlaylist;
+  public config: IPlayerConfig;
 
   constructor (customConfig: IPlayerConfig, playlist: IPlaylist) {
     super();
     this.config = deepExtend({}, defaultConfig, customConfig);
     this.playlist = playlist;
-    this.registerEvents();
   }
 
   /**
@@ -57,7 +54,7 @@ export default class PurePlayer extends EventEmitter {
     return this.currentTrack;
   }
 
-  private setCurrentTrack(track: Track) {
+  public setCurrentTrack(track: Track) {
     this.currentTrack = track;
   }
 
@@ -69,7 +66,7 @@ export default class PurePlayer extends EventEmitter {
     return this.audioElement.volume;
   }
 
-  private playTrack(track: Track) {
+  public playTrack(track: Track) {
     if (!this.audioElement) {
       this.createAudioElement();
     }
@@ -92,52 +89,11 @@ export default class PurePlayer extends EventEmitter {
     audio.play();
   }
 
-  private createAudioElement() {
+  public createAudioElement() {
     const audio: any = new Audio();
     for (let attrName in this.config.audioAttributes) {
       audio[attrName] = this.config.audioAttributes[attrName];
     }
     this.audioElement = audio as HTMLAudioElement;
-  }
-
-  private registerEvents() {
-    const config: any = this.config;
-    const getClass = (ctrlName: string): string => {
-      const className: string = config.nodes[ctrlName];
-      return '.' + className;
-    };
-    const addEvent = (eventName: string, ctrlName: string,
-                      callback: Function) => {
-      $.on(eventName, getClass(ctrlName), (event: Event) => {
-        if (!config.preventEvents) {
-          callback(event);
-        }
-      });
-    };
-
-    addEvent('click', 'btnPlay', () => {
-      this.playTrack(this.getCurrentTrack());
-    });
-    addEvent('click', 'btnPause', () => {
-      this.pause();
-    });
-    addEvent('click', 'btnStop', () => {
-      this.stop();
-    });
-    addEvent('click', 'btnNext', () => {
-      this.stop();
-      this.playlist.nextTrack(config.circular);
-      this.setCurrentTrack(this.playlist.getCurrentTrack());
-      this.playTrack(this.getCurrentTrack());
-    });
-    addEvent('click', 'btnPrev', () => {
-      this.stop();
-      this.playlist.prevTrack(config.circular);
-      this.setCurrentTrack(this.playlist.getCurrentTrack());
-      this.playTrack(this.getCurrentTrack());
-    });
-    addEvent('change', 'inputTime', () => {
-
-    });
   }
 }

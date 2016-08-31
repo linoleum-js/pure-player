@@ -1,5 +1,5 @@
-import ITrackData from "./ITrackData";
-import IStreamUrl from "./IStreamUrl";
+import ITrackData from "./interfaces/ITrackData";
+import IStreamUrl from "./interfaces/IStreamUrl";
 
 export default class Track {
   private data: ITrackData;

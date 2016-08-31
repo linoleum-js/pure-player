@@ -1,7 +1,7 @@
 
 import Playlist from "./Playlist";
 import Track from "./Track";
-import ITrackData from "./ITrackData";
+import ITrackData from "./interfaces/ITrackData";
 
 export default class PlaylistManager {
   private playlists: Array<Playlist> = [];
@@ -67,5 +67,13 @@ export default class PlaylistManager {
 
   public prevTrack(circular: boolean) {
     this.currentPlaylist.prevTrack(circular);
+  }
+
+  public isLastTrack() {
+    return this.currentPlaylist.isLastTrack();
+  }
+
+  public isFirstTrack() {
+    return this.currentPlaylist.isFirstTrack();
   }
 }

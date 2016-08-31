@@ -1,6 +1,6 @@
 
 import Track from "./Track";
-import {EventEmitter} from "./util";
+import {EventEmitter} from "./utils/util";
 
 export default class Playlist extends EventEmitter {
   private name: string;
@@ -56,5 +56,13 @@ export default class Playlist extends EventEmitter {
     } else if (circular) {
       this.currentTrack = this.tracks.length - 1;
     }
+  }
+
+  public isLastTrack() {
+    return this.currentTrack === this.tracks.length - 1;
+  }
+
+  public isFirstTrack() {
+    return this.currentTrack === 0;
   }
 }

@@ -66,3 +66,15 @@ export function matchesSelector (element: HTMLElement|EventTarget,
 
   return nativeMatches.call(element, selector);
 }
+
+export function on (eventName: string, selector: string, callback: Function)  {
+  document.addEventListener(eventName, (event: Event) => {
+    if (matchesSelector(event.target, selector)) {
+      callback(event);
+    }
+  }, false);
+}
+
+export function $ (selector: string): NodeList {
+  return document.querySelectorAll(selector);
+}

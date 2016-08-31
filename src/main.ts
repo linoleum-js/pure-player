@@ -1,8 +1,12 @@
 
 import PurePlayer from "./Player";
-import PlaylistPanager from "./PlaylistManager";
+import PlaylistManager from "./PlaylistManager";
+import PlayerController from "./PlayerController";
 
 export default function createPlayer (config: any) {
-  return new PurePlayer(config || {}, new PlaylistPanager());
+  const player = new PurePlayer(config || {}, new PlaylistManager());
+  const controller = new PlayerController(player);
+  controller.registerEvents();
+  return player;
 };
 

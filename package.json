@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": "https://github.com/linoleum-js/pure-player",
   "scripts": {
-    "start": "watchify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]",
+    "build": "watchify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]",
     "open-test": "testem & xdg-open http://localhost:7357/",
     "test": "watchify ./spec/entry.ts -o ./spec/tmp/spec.js -p [ tsify ] & npm run open-test",
     "postinstall": "browserify ./src/main.ts -o index.js -p [ tsify --noImplicitAny ]"
@@ -17,6 +17,8 @@
   "author": "Martin Schulz",
   "license": "MIT",
   "devDependencies": {
+    "connect": "^3.4.1",
+    "serve-static": "^1.11.1",
     "tsify": "^0.15.3",
     "watchify": "*"
   }
